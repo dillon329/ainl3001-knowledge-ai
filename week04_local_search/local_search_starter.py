@@ -200,10 +200,27 @@ def simulated_annealing(problem, start_board):
 
     temperature = 10.0
     cooling_rate = 0.95
+    
+    while temperature > 0.00000001:
+        if count_conflicts(current) == 0:
+            break
+        neighbours = generate_neighbours(problem,current)
+        neighbour = random.choice(neighbours)
+        
+        if count_conflicts(current) > count_conflicts(neighbour):
+            current = neighbour
+        else:
+            probability = math.exp(-(-count_conflicts(current) + count_conflicts(neighbour))/temperature)
+            if random.random() < probability:
+                current = neighbour
+        temperature = temperature * cooling_rate
+        
+    return current
+            
+        
+    
 
-    # TODO
-
-    pass
+    
 
 
 # --------------------------------------------------
@@ -248,3 +265,6 @@ if __name__ == "__main__":
     
     result = hill_climbing(problem, board)
     print("This is the hill search result\n",result, count_conflicts(result))
+    
+    result_new = simulated_annealing(problem,board)
+    print("Simulated Annealing results:\n",result_new, count_conflicts(result_new))
