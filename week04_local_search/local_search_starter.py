@@ -82,8 +82,20 @@ def count_conflicts(board):
     #
     #   1. in the same row
     #   2. on the same diagonal
+    
+    
+    conflict = 0
 
-    pass
+    print("This is conflicts")
+    for i in range(len(board)):
+        for j in range(i+1,len(board)):
+            if board[i] == board[j] or abs(board[i]-board[j]) == abs(i-j):
+                conflict += 1
+              
+                
+    return conflict        
+        
+    
 
 
 # --------------------------------------------------
@@ -107,7 +119,14 @@ def generate_neighbours(problem, board):
     # 1. Ask the problem for the available actions.
     # 2. Apply each action.
     # 3. Add the resulting state to neighbours.
-
+    actions = problem.actions(board)
+    
+    for action in actions:
+        
+        result = problem.result(board,action)
+        neighbours.append(result)
+    
+    
     return neighbours
 
 
