@@ -159,6 +159,7 @@ def hill_climbing(problem, start_board):
     """
 
     current = start_board
+    
     while True:
         lowest_conflict = count_conflicts(current)
         neighbours = generate_neighbours(problem,current)
@@ -217,6 +218,17 @@ def simulated_annealing(problem, start_board):
         
     return current
             
+def show_board(board):
+    board_string = ''
+    for piece in board:
+        og_string = '.'* N
+        char_insert = 'q'
+        index = piece
+        updated = og_string[:index] + char_insert + og_string[index + 1:]
+        board_string += updated + '\n'
+    return board_string
+        
+        
         
     
 
@@ -262,9 +274,11 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
-    
+    print(show_board(board))
     result = hill_climbing(problem, board)
     print("This is the hill search result\n",result, count_conflicts(result))
+    print(show_board(result))
     
     result_new = simulated_annealing(problem,board)
     print("Simulated Annealing results:\n",result_new, count_conflicts(result_new))
+    print(show_board(result_new))
