@@ -86,7 +86,6 @@ def count_conflicts(board):
     
     conflict = 0
 
-    print("This is conflicts")
     for i in range(len(board)):
         for j in range(i+1,len(board)):
             if board[i] == board[j] or abs(board[i]-board[j]) == abs(i-j):
@@ -160,10 +159,26 @@ def hill_climbing(problem, start_board):
     """
 
     current = start_board
+    while True:
+        lowest_conflict = count_conflicts(current)
+        neighbours = generate_neighbours(problem,current)
+        
+        for neighbour in neighbours:
+            if count_conflicts(neighbour) < lowest_conflict:
+                lowest_conflict = count_conflicts(neighbour)
+                neighbour_lowest = neighbour
+        if lowest_conflict >= count_conflicts(current):
+            break
+        else:
+            current = neighbour_lowest
+    
+             
+    return current    
+        
 
     # TODO
 
-    pass
+    
 
 
 # --------------------------------------------------
@@ -230,3 +245,6 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
+    
+    result = hill_climbing(problem, board)
+    print("This is the hill search result\n",result, count_conflicts(result))
