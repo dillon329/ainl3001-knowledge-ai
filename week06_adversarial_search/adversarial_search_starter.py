@@ -54,7 +54,11 @@ WINNING_LINES = [
 def print_board(state):
     """Display the nine cells as a 3-by-3 board."""
     # TODO: Print three rows of three cells.
-    pass
+    for row in range(3):
+        cells = state[row * 3:row * 3 + 3]
+        print(" " + " | ".join(cells))
+        if row < 2:
+            print("---+---+---")
 
 
 # --------------------------------------------------
@@ -64,7 +68,7 @@ def print_board(state):
 def available_moves(state):
     """Return indices of empty cells (0 through 8)."""
     # TODO: Find every position containing " ".
-    pass
+    return [index for index, cell in enumerate(state) if cell == " "]
 
 
 # --------------------------------------------------
@@ -77,7 +81,9 @@ def make_move(state, move, player):
     Assume move is legal. Do not modify the input board.
     """
     # TODO: Copy the board and place the player's mark.
-    pass
+    new_state = state.copy()
+    new_state[move] = player
+    return new_state
 
 
 # --------------------------------------------------
@@ -87,7 +93,10 @@ def make_move(state, move, player):
 def check_winner(state):
     """Return 'X', 'O' or None by checking all winning lines."""
     # TODO: Check each (a, b, c) in WINNING_LINES.
-    pass
+    for a, b, c in WINNING_LINES:
+        if state[a] != " " and state[a] == state[b] == state[c]:
+            return state[a]
+    return None
 
 
 # --------------------------------------------------
@@ -97,7 +106,7 @@ def check_winner(state):
 def is_terminal(state):
     """Return True for a win or a full board (draw)."""
     # TODO: Detect a winner OR no remaining empty cells.
-    pass
+    return check_winner(state) is not None or " " not in state
 
 
 # --------------------------------------------------
@@ -110,7 +119,12 @@ def utility(state):
     Minimax calls this only at terminal states.
     """
     # TODO: Use check_winner() and return +1, -1 or 0.
-    pass
+    winner = check_winner(state)
+    if winner == "X":
+        return 1
+    if winner == "O":
+        return -1
+    return 0
 
 
 # --------------------------------------------------
@@ -129,7 +143,25 @@ def minimax(state, maximizing, counter):
     # 3. For X (MAX), recursively choose the highest score.
     # 4. For O (MIN), recursively choose the lowest score.
     # Use make_move() to avoid changing the original board.
-    pass
+    counter["nodes"] += 1
+
+    if is_terminal(state):
+        return utility(state)
+
+    if maximizing:
+        best_score = float("-inf")
+        for move in available_moves(state):
+            child = make_move(state, move, "X")
+            score = minimax(child, False, counter)
+            best_score = max(best_score, score)
+        return best_score
+
+    best_score = float("inf")
+    for move in available_moves(state):
+        child = make_move(state, move, "O")
+        score = minimax(child, True, counter)
+        best_score = min(best_score, score)
+    return best_score
 
 
 # --------------------------------------------------
@@ -144,7 +176,20 @@ def best_move(state, counter):
     # TODO: Try each legal X move, call minimax() for O's turn,
     # and return the move with the highest score.
     # If the board is terminal, return None.
-    pass
+    if is_terminal(state):
+        return None
+
+    chosen_move = None
+    best_score = float("-inf")
+
+    for move in available_moves(state):
+        child = make_move(state, move, "X")
+        score = minimax(child, False, counter)
+        if score > best_score:
+            best_score = score
+            chosen_move = move
+
+    return chosen_move
 
 
 # --------------------------------------------------
@@ -161,7 +206,31 @@ def alpha_beta(state, maximizing, alpha, beta, counter):
     # - MAX updates alpha; MIN updates beta.
     # - Stop exploring remaining moves if alpha >= beta.
     # - Count visited nodes exactly as in minimax().
-    pass
+    counter["nodes"] += 1
+
+    if is_terminal(state):
+        return utility(state)
+
+    if maximizing:
+        best_score = float("-inf")
+        for move in available_moves(state):
+            child = make_move(state, move, "X")
+            score = alpha_beta(child, False, alpha, beta, counter)
+            best_score = max(best_score, score)
+            alpha = max(alpha, best_score)
+            if alpha >= beta:
+                break
+        return best_score
+
+    best_score = float("inf")
+    for move in available_moves(state):
+        child = make_move(state, move, "O")
+        score = alpha_beta(child, True, alpha, beta, counter)
+        best_score = min(best_score, score)
+        beta = min(beta, best_score)
+        if alpha >= beta:
+            break
+    return best_score
 
 
 # --------------------------------------------------
@@ -173,7 +242,23 @@ def best_move_alpha_beta(state, counter):
     # TODO: Like best_move(), but call alpha_beta().
     # Start alpha at -infinity and beta at +infinity.
     # Update alpha after each candidate X move.
-    pass
+    if is_terminal(state):
+        return None
+
+    chosen_move = None
+    best_score = float("-inf")
+    alpha = float("-inf")
+    beta = float("inf")
+
+    for move in available_moves(state):
+        child = make_move(state, move, "X")
+        score = alpha_beta(child, False, alpha, beta, counter)
+        if score > best_score:
+            best_score = score
+            chosen_move = move
+        alpha = max(alpha, best_score)
+
+    return chosen_move
 
 
 # --------------------------------------------------

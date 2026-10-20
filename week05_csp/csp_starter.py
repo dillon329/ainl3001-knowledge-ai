@@ -75,7 +75,14 @@ def is_valid_assignment(assignment):
     # 2. If BOTH regions have been assigned, compare their colours.
     # 3. Return False if neighbouring regions have the same colour.
     # 4. Otherwise return True.
-    pass
+    for neighbour in constraints:
+        region_a, region_b = neighbour
+
+        if region_a in assignment and region_b in assignment:
+            if assignment[region_a] == assignment[region_b]:
+                return False
+
+    return True
 
 
 # --------------------------------------------------
@@ -99,7 +106,11 @@ def select_unassigned_variable(assignment):
     # For each unassigned variable, temporarily try each colour,
     # check is_valid_assignment(), and undo the temporary assignment.
     # Count legal colours and choose the variable with the fewest.
-    pass
+    for variable in variables:
+        if variable not in assignment:
+            return variable
+
+    return None
 
 
 # --------------------------------------------------
@@ -116,7 +127,23 @@ def backtracking_search(assignment):
     # 5. Return the recursive result if a solution was found.
     # 6. Otherwise remove the temporary assignment (backtrack).
     # 7. Return None if every colour fails.
-    pass
+    if len(assignment) == len(variables):
+        return assignment.copy()
+
+    variable = select_unassigned_variable(assignment)
+
+    for colour in domains[variable]:
+        assignment[variable] = colour
+
+        if is_valid_assignment(assignment):
+            result = backtracking_search(assignment)
+
+            if result is not None:
+                return result
+
+        del assignment[variable]
+
+    return None
 
 
 # --------------------------------------------------
@@ -125,6 +152,15 @@ def backtracking_search(assignment):
 
 # Six regions with three possible colours each give 3 ** 6 = 729
 # complete assignments. Why can backtracking avoid checking all 729?
+#
+# Brute force builds every complete assignment and only checks it at
+# the end. Backtracking checks each PARTIAL assignment as it is built.
+# As soon as two neighbours share a colour, that branch is abandoned,
+# so every complete assignment that starts with that clash is skipped.
+# For example, WA = Red and NT = Red is rejected immediately, which
+# rules out all 3 ** 4 = 81 ways of colouring the other four regions.
+# Finding one valid solution does not mean all solutions were found:
+# the search stops at the first one.
 
 
 # --------------------------------------------------
